@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"></stop>
+      <stop offset="50%" stop-color="#cbd5e1"></stop>
+      <stop offset="100%" stop-color="#64748b"></stop>
+    </linearGradient>
+    
+    <linearGradient id="energy" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f97316"></stop>
+      <stop offset="50%" stop-color="#fb923c"></stop>
+      <stop offset="100%" stop-color="#fdba74"></stop>
+    </linearGradient>
+  </defs>
+
+  
+  <rect width="512" height="512" rx="108" fill="#002395"></rect>
+
+  
+  <path d="M70 390 L210 170 L275 240 L440 80" stroke="url(#energy)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"></path>
+
+  
+  <path d="M65 268 Q 256 238 447 268" stroke="url(#metal)" stroke-width="28" stroke-linecap="round" fill="none"></path>
+
+  
+  <g fill="url(#metal)">
+    <rect x="78" y="230" width="28" height="52" rx="6"></rect>
+    <rect x="102" y="212" width="36" height="88" rx="7"></rect>
+    <rect x="132" y="194" width="44" height="124" rx="8"></rect>
+  </g>
+
+  
+  <g fill="url(#metal)">
+    <rect x="406" y="230" width="28" height="52" rx="6"></rect>
+    <rect x="374" y="212" width="36" height="88" rx="7"></rect>
+    <rect x="336" y="194" width="44" height="124" rx="8"></rect>
+  </g>
+
+  
+  <circle cx="256" cy="253" r="16" fill="#f97316"></circle>
+  <circle cx="256" cy="253" r="7" fill="#002395"></circle>
+</svg>

@@ -1,0 +1,20 @@
+{
+  "name": "HeavyDuty 5×5+",
+  "short_name": "HeavyDuty",
+  "description": "Offline-First трекер силовых тренировок и гипертрофии StrongLifts 5×5 Plus",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090a0f",
+  "theme_color": "#090a0f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/dumbbell.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["fitness", "health", "sports"],
+  "lang": "ru"
+}
