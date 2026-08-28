@@ -52,14 +52,10 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
   const [isWorkoutNotesOpen, setIsWorkoutNotesOpen] = useState(Boolean(workout.notes));
   const [openExerciseNoteIds, setOpenExerciseNoteIds] = useState<Record<string, boolean>>({});
 
-  // Timer interval for total workout duration
+  // Timer interval for total workout duration (updates UI counter without thrashing state)
   useEffect(() => {
     const interval = setInterval(() => {
-      setElapsedSeconds((prev) => {
-        const next = prev + 1;
-        onUpdateWorkout({ ...workout, durationSeconds: next });
-        return next;
-      });
+      setElapsedSeconds((prev) => prev + 1);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -713,6 +709,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
               <button
                 onClick={() => {
                   setShowFinishModal(false);
+                  onUpdateWorkout({ ...workout, durationSeconds: elapsedSeconds });
                   onFinishWorkout();
                 }}
                 className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-base shadow-lg shadow-emerald-500/25 active:scale-[0.98] transition flex items-center justify-center gap-2"
