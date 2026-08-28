@@ -527,7 +527,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                             {/* Micro-increment buttons */}
                             {!set.completed && !exercise.isBodyweight && (
                               <div className="flex gap-1 mt-1">
-                                {[+2.5, +5].map((inc) => (
+                                {[-2.5, +2.5, +5].map((inc) => (
                                   <button
                                     key={inc}
                                     onClick={() =>
@@ -535,9 +535,9 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                                         weightKg: Math.max(0, Math.round((set.weightKg + inc) * 10) / 10),
                                       })
                                     }
-                                    className="px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 text-[9px] font-bold text-slate-300 rounded transition"
+                                    className="px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 text-[9px] font-bold text-slate-300 rounded transition active:scale-95"
                                   >
-                                    +{inc}
+                                    {inc > 0 ? `+${inc}` : inc}
                                   </button>
                                 ))}
                               </div>

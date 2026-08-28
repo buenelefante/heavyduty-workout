@@ -64,13 +64,13 @@ export const OneRMCalculatorModal: React.FC<OneRMCalculatorModalProps> = ({
               />
             </div>
             <div className="flex gap-1 mt-2">
-              {[+2.5, +5, +10].map((inc) => (
+              {[-2.5, +2.5, +5, +10].map((inc) => (
                 <button
                   key={inc}
-                  onClick={() => setWeight((prev) => prev + inc)}
+                  onClick={() => setWeight((prev) => Math.max(0, prev + inc))}
                   className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-md text-[10px] font-bold text-slate-300 transition"
                 >
-                  +{inc}
+                  {inc > 0 ? `+${inc}` : inc}
                 </button>
               ))}
             </div>
