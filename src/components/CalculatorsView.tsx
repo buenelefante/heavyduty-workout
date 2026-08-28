@@ -174,8 +174,13 @@ export const CalculatorsView: React.FC = () => {
                 <label className="text-xs text-slate-400 block mb-1">Вес (кг)</label>
                 <input
                   type="number"
-                  value={oneRMWeight}
-                  onChange={(e) => setOneRMWeight(Math.max(0, Number(e.target.value)))}
+                  inputMode="decimal"
+                  value={oneRMWeight === 0 ? '' : oneRMWeight}
+                  placeholder="—"
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setOneRMWeight(val === '' ? 0 : Math.max(0, Number(val)));
+                  }}
                   className="w-full bg-transparent font-mono font-extrabold text-xl text-emerald-400 outline-none"
                 />
               </div>
@@ -183,8 +188,13 @@ export const CalculatorsView: React.FC = () => {
                 <label className="text-xs text-slate-400 block mb-1">Повторы</label>
                 <input
                   type="number"
-                  value={oneRMReps}
-                  onChange={(e) => setOneRMReps(Math.max(1, Number(e.target.value)))}
+                  inputMode="numeric"
+                  value={oneRMReps === 0 ? '' : oneRMReps}
+                  placeholder="—"
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setOneRMReps(val === '' ? 0 : Math.max(0, Number(val)));
+                  }}
                   className="w-full bg-transparent font-mono font-extrabold text-xl text-cyan-400 outline-none"
                 />
               </div>

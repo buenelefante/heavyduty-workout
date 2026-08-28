@@ -20,8 +20,7 @@ const SYNC_KEY_STORAGE_KEY = 'heavyduty_sync_key';
 const LAST_SYNCED_STORAGE_KEY = 'heavyduty_last_synced';
 
 // Primary & fallback endpoints
-const NETLIFY_SYNC_API = '/.netlify/functions/sync';
-const PUBLIC_KV_FALLBACK = 'https://kvdb.io/Ank3p98M79hS9D7g7tZ9jL/';
+const NETLIFY_API_ROUTES = ['/api/sync', '/.netlify/functions/sync'];
 
 /**
  * Generates a clean, human-readable 8-char sync key: e.g. "HD-8391-7249"
@@ -65,33 +64,30 @@ export function getLastSyncedAt(): string | null {
 async function fetchRemoteData(syncKey: string): Promise<SyncCloudData | null> {
   const normalizedKey = syncKey.toUpperCase().trim();
 
-  // Try 1: Netlify Function
-  try {
-    const res = await fetch(`${NETLIFY_SYNC_API}?key=${encodeURIComponent(normalizedKey)}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (res.ok) {
-      const json = await res.json();
-      if (json.found && json.data) {
-        return json.data;
+  for (const endpoint of NETLIFY_API_ROUTES) {
+    try {
+      const res = await fetch(`${endpoint}?key=${encodeURIComponent(normalizedKey)}`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+      });
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
+        const json = await res.json();
+        if (json.found && json.data) {
+          return json.data;
+        } else if (json.found === false) {
+          // Explicitly empty key in cloud
+          return {
+            syncKey: normalizedKey,
+            workouts: [],
+            personalRecords: [],
+            updatedAt: new Date().toISOString(),
+          };
+        }
       }
+    } catch (err) {
+      // Continue trying next endpoint
     }
-  } catch (err) {
-    // Continue to fallback
-  }
-
-  // Try 2: KV Fallback
-  try {
-    const res = await fetch(`${PUBLIC_KV_FALLBACK}${encodeURIComponent(normalizedKey)}`, {
-      method: 'GET',
-    });
-    if (res.ok) {
-      const data = await res.json();
-      return data;
-    }
-  } catch (err) {
-    // Failed to fetch remote
   }
 
   return null;
@@ -102,37 +98,31 @@ async function fetchRemoteData(syncKey: string): Promise<SyncCloudData | null> {
  */
 async function uploadRemoteData(payload: SyncCloudData): Promise<boolean> {
   const normalizedKey = payload.syncKey.toUpperCase().trim();
-  let uploaded = false;
+  const body = JSON.stringify({ ...payload, syncKey: normalizedKey });
 
-  // Try 1: Netlify Function
-  try {
-    const res = await fetch(NETLIFY_SYNC_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-      uploaded = true;
+  for (const endpoint of NETLIFY_API_ROUTES) {
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body,
+      });
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
+        const json = await res.json();
+        if (json.success) {
+          return true;
+        }
+      }
+    } catch (err) {
+      // Continue trying next endpoint
     }
-  } catch (err) {
-    // Continue to fallback
   }
 
-  // Try 2: KV Fallback
-  try {
-    const res = await fetch(`${PUBLIC_KV_FALLBACK}${encodeURIComponent(normalizedKey)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-      uploaded = true;
-    }
-  } catch (err) {
-    // Ignored
-  }
-
-  return uploaded;
+  return false;
 }
 
 /**
@@ -222,7 +212,14 @@ export async function performSync(overrideKey?: string): Promise<SyncResult> {
       updatedAt: new Date().toISOString(),
     };
 
-    await uploadRemoteData(cloudPayload);
+    const uploadSuccess = await uploadRemoteData(cloudPayload);
+    if (!uploadSuccess && remoteData === null && localWorkouts.length > 0) {
+      return {
+        success: false,
+        message: 'Не удалось передать данные в облако. Проверьте подключение к интернету.',
+        syncedWorkoutsCount: localWorkouts.length,
+      };
+    }
 
     // 6. Record last sync time
     const nowIso = new Date().toISOString();

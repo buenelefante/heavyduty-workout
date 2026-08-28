@@ -511,13 +511,14 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                                 type="number"
                                 inputMode="decimal"
                                 disabled={set.completed}
-                                value={set.weightKg === 0 && exercise.isBodyweight ? '' : set.weightKg}
-                                placeholder={exercise.isBodyweight ? 'Свой вес' : '0'}
-                                onChange={(e) =>
+                                value={set.weightKg === 0 ? '' : set.weightKg}
+                                placeholder={exercise.isBodyweight ? 'Свой вес' : '—'}
+                                onChange={(e) => {
+                                  const val = e.target.value;
                                   handleUpdateSet(exIdx, setIdx, {
-                                    weightKg: Number(e.target.value),
-                                  })
-                                }
+                                    weightKg: val === '' ? 0 : Number(val),
+                                  });
+                                }}
                                 className="w-full bg-transparent font-mono font-extrabold text-sm text-center text-emerald-400 outline-none disabled:opacity-75"
                               />
                               <span className="text-[10px] text-slate-500 font-semibold">кг</span>
@@ -562,7 +563,7 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                               }}
                               className={`px-3 py-1.5 rounded-xl font-mono font-bold text-xs flex items-center gap-1 transition ${
                                 plankTimer.running
-                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'
+                                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'
                                   : 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/25'
                               }`}
                             >
@@ -577,12 +578,14 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
                                 type="number"
                                 inputMode="numeric"
                                 disabled={set.completed}
-                                value={set.reps}
-                                onChange={(e) =>
+                                value={set.reps === 0 ? '' : set.reps}
+                                placeholder="—"
+                                onChange={(e) => {
+                                  const val = e.target.value;
                                   handleUpdateSet(exIdx, setIdx, {
-                                    reps: Math.max(0, Number(e.target.value)),
-                                  })
-                                }
+                                    reps: val === '' ? 0 : Math.max(0, Number(val)),
+                                  });
+                                }}
                                 className="w-full bg-transparent font-mono font-extrabold text-sm text-center text-cyan-400 outline-none disabled:opacity-75"
                               />
                               <span className="text-[10px] text-slate-500 font-semibold">повт</span>

@@ -1,21 +1,13 @@
-// Serverless Cloud Sync Function for Netlify
-// Stores encrypted/encoded workout data per syncKey
+import { getStore } from '@netlify/blobs';
 
-interface SyncPayload {
-  syncKey: string;
-  workouts: any[];
-  personalRecords: any[];
-  settings?: any;
-  updatedAt: string;
-}
-
-// In-memory cache for fast serverless execution
-const globalMemoryStore = new Map<string, SyncPayload>();
-
-export async function handler(event: { httpMethod: string; body: string | null; queryStringParameters?: Record<string, string> }) {
+export async function handler(event: {
+  httpMethod: string;
+  body: string | null;
+  queryStringParameters?: Record<string, string>;
+}) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Content-Type': 'application/json',
   };
@@ -25,19 +17,21 @@ export async function handler(event: { httpMethod: string; body: string | null; 
   }
 
   try {
-    // GET: Retrieve remote state by syncKey
+    const store = getStore({ name: 'heavyduty-vault' });
+
+    // GET: fetch workouts by key
     if (event.httpMethod === 'GET') {
       const syncKey = event.queryStringParameters?.key;
       if (!syncKey) {
         return {
           statusCode: 400,
           headers,
-          body: JSON.stringify({ error: 'Missing sync key parameter' }),
+          body: JSON.stringify({ error: 'Missing key parameter' }),
         };
       }
 
       const normalizedKey = syncKey.toUpperCase().trim();
-      const existingData = globalMemoryStore.get(normalizedKey);
+      const existingData = await store.get(normalizedKey, { type: 'json' });
 
       return {
         statusCode: 200,
@@ -49,22 +43,29 @@ export async function handler(event: { httpMethod: string; body: string | null; 
       };
     }
 
-    // POST: Save/Merge remote state
+    // POST: save/merge workouts by key
     if (event.httpMethod === 'POST') {
       if (!event.body) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Empty body' }) };
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Empty body' }),
+        };
       }
 
-      const payload: SyncPayload = JSON.parse(event.body);
+      const payload = JSON.parse(event.body);
       if (!payload.syncKey) {
-        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing syncKey' }) };
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Missing syncKey in payload' }),
+        };
       }
 
       const normalizedKey = payload.syncKey.toUpperCase().trim();
-      
-      // Store in memory cache
       payload.updatedAt = new Date().toISOString();
-      globalMemoryStore.set(normalizedKey, payload);
+
+      await store.setJSON(normalizedKey, payload);
 
       return {
         statusCode: 200,
@@ -78,7 +79,11 @@ export async function handler(event: { httpMethod: string; body: string | null; 
       };
     }
 
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: 'Method not allowed' }),
+    };
   } catch (error: any) {
     return {
       statusCode: 500,

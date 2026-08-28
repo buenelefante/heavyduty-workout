@@ -54,8 +54,12 @@ export const OneRMCalculatorModal: React.FC<OneRMCalculatorModalProps> = ({
               <input
                 type="number"
                 inputMode="decimal"
-                value={weight}
-                onChange={(e) => setWeight(Math.max(0, Number(e.target.value)))}
+                value={weight === 0 ? '' : weight}
+                placeholder="—"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setWeight(val === '' ? 0 : Math.max(0, Number(val)));
+                }}
                 className="w-full bg-transparent font-mono font-extrabold text-2xl text-emerald-400 outline-none"
               />
             </div>
@@ -78,8 +82,12 @@ export const OneRMCalculatorModal: React.FC<OneRMCalculatorModalProps> = ({
               <input
                 type="number"
                 inputMode="numeric"
-                value={reps}
-                onChange={(e) => setReps(Math.max(1, Number(e.target.value)))}
+                value={reps === 0 ? '' : reps}
+                placeholder="—"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setReps(val === '' ? 0 : Math.max(0, Number(val)));
+                }}
                 className="w-full bg-transparent font-mono font-extrabold text-2xl text-cyan-400 outline-none"
               />
             </div>
