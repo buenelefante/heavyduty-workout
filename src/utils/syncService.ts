@@ -19,11 +19,12 @@ export interface SyncCloudData {
 const SYNC_KEY_STORAGE_KEY = 'heavyduty_sync_key';
 const LAST_SYNCED_STORAGE_KEY = 'heavyduty_last_synced';
 
-// Primary & fallback endpoints
-const NETLIFY_API_ROUTES = ['/api/sync', '/.netlify/functions/sync'];
+// Global high-speed Redis Cloud Endpoint with instant CORS sync
+const UPSTASH_ENDPOINT = 'https://live-katydid-218032.upstash.io';
+const UPSTASH_TOKEN = 'gQAAAAAAA1OwAQIgcDIzOGNiOGYzNDIyZjc0NDI0YmVkOWZjNmMwMWM5ZjRhZQ';
 
 /**
- * Generates a clean, human-readable 8-char sync key: e.g. "HD-8391-7249"
+ * Generates a clean human-readable sync key: e.g. "HD-8391-7249"
  */
 export function generateSyncKey(): string {
   const part1 = Math.floor(1000 + Math.random() * 9000);
@@ -64,7 +65,30 @@ export function getLastSyncedAt(): string | null {
 async function fetchRemoteData(syncKey: string): Promise<SyncCloudData | null> {
   const normalizedKey = syncKey.toUpperCase().trim();
 
-  for (const endpoint of NETLIFY_API_ROUTES) {
+  // 1. Direct Cloud Redis Query
+  try {
+    const res = await fetch(UPSTASH_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${UPSTASH_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(['GET', `sync:${normalizedKey}`]),
+    });
+
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.result) {
+        const parsed = JSON.parse(json.result);
+        return parsed as SyncCloudData;
+      }
+    }
+  } catch (err) {
+    console.error('Cloud fetch error:', err);
+  }
+
+  // 2. Fallback: Netlify Functions
+  for (const endpoint of ['/api/sync', '/.netlify/functions/sync']) {
     try {
       const res = await fetch(`${endpoint}?key=${encodeURIComponent(normalizedKey)}`, {
         method: 'GET',
@@ -75,19 +99,9 @@ async function fetchRemoteData(syncKey: string): Promise<SyncCloudData | null> {
         const json = await res.json();
         if (json.found && json.data) {
           return json.data;
-        } else if (json.found === false) {
-          // Explicitly empty key in cloud
-          return {
-            syncKey: normalizedKey,
-            workouts: [],
-            personalRecords: [],
-            updatedAt: new Date().toISOString(),
-          };
         }
       }
-    } catch (err) {
-      // Continue trying next endpoint
-    }
+    } catch (err) {}
   }
 
   return null;
@@ -98,28 +112,41 @@ async function fetchRemoteData(syncKey: string): Promise<SyncCloudData | null> {
  */
 async function uploadRemoteData(payload: SyncCloudData): Promise<boolean> {
   const normalizedKey = payload.syncKey.toUpperCase().trim();
-  const body = JSON.stringify({ ...payload, syncKey: normalizedKey });
+  const rawJson = JSON.stringify(payload);
 
-  for (const endpoint of NETLIFY_API_ROUTES) {
+  // 1. Direct Cloud Redis Store
+  try {
+    const res = await fetch(UPSTASH_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${UPSTASH_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(['SET', `sync:${normalizedKey}`, rawJson]),
+    });
+
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.result === 'OK') {
+        return true;
+      }
+    }
+  } catch (err) {
+    console.error('Cloud upload error:', err);
+  }
+
+  // 2. Fallback: Netlify Serverless Function
+  for (const endpoint of ['/api/sync', '/.netlify/functions/sync']) {
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body,
+        headers: { 'Content-Type': 'application/json' },
+        body: rawJson,
       });
-      const contentType = res.headers.get('content-type') || '';
-      if (res.ok && contentType.includes('application/json')) {
-        const json = await res.json();
-        if (json.success) {
-          return true;
-        }
+      if (res.ok) {
+        return true;
       }
-    } catch (err) {
-      // Continue trying next endpoint
-    }
+    } catch (err) {}
   }
 
   return false;
@@ -129,7 +156,7 @@ async function uploadRemoteData(payload: SyncCloudData): Promise<boolean> {
  * Smart 2-way Merge between local Dexie IndexedDB and Remote Cloud
  */
 export async function performSync(overrideKey?: string): Promise<SyncResult> {
-  const syncKey = overrideKey || getSavedSyncKey();
+  const syncKey = (overrideKey || getSavedSyncKey())?.toUpperCase().trim();
 
   if (!syncKey) {
     return {

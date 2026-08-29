@@ -94,7 +94,7 @@ export const SyncModal: React.FC<SyncModalProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleGenerateNewKey = () => {
+  const handleGenerateNewKey = async () => {
     const newKey = generateSyncKey();
     setSyncKey(newKey);
     setInputKey(newKey);
@@ -109,11 +109,14 @@ export const SyncModal: React.FC<SyncModalProps> = ({
         light: '#ffffff',
       },
     }).then(setQrDataUrl).catch(console.error);
+
+    // Initial sync with the new key to push existing local workouts
+    await handleTriggerSync(newKey);
   };
 
   const handleApplyInputKey = async () => {
     if (!inputKey.trim()) return;
-    const cleanKey = inputKey.toUpperCase().trim();
+    const cleanKey = inputKey.trim();
     setSyncKey(cleanKey);
     saveSyncKey(cleanKey);
 
