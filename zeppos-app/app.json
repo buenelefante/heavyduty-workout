@@ -1,0 +1,64 @@
+{
+  "$schema": "https://docs.zepp.com/schema/app.json",
+  "configVersion": "v2",
+  "app": {
+    "appId": 1093481,
+    "appName": "HeavyDuty",
+    "appType": "app",
+    "version": {
+      "code": 1,
+      "name": "1.0.0"
+    },
+    "icon": "assets/icon.png",
+    "vender": "HeavyDuty"
+  },
+  "permissions": [
+    "device:os.sensor.heart_rate",
+    "device:os.vibrate",
+    "device:os.screen",
+    "device:os.fs"
+  ],
+  "runtime": {
+    "apiVersion": {
+      "compatible": "3.0.0",
+      "target": "4.0.0"
+    }
+  },
+  "targets": {
+    "amazfit-balance": {
+      "module": {
+        "page": {
+          "pages": [
+            "page/home/index",
+            "page/workout/index",
+            "page/rest/index",
+            "page/summary/index"
+          ]
+        },
+        "app": {
+          "exec": "app.js"
+        },
+        "side": {
+          "exec": "side-service/index.js"
+        },
+        "setting": {
+          "exec": "setting/index.js"
+        }
+      },
+      "platforms": [
+        {
+          "name": "balance",
+          "deviceSource": 279
+        },
+        {
+          "name": "balance-w",
+          "deviceSource": 11141376
+        }
+      ],
+      "designWidth": 480
+    }
+  },
+  "package": {
+    "mode": "production"
+  }
+}
