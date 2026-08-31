@@ -6,19 +6,10 @@ import { WORKOUT_TEMPLATES, THEME } from '../../utils/constants';
 Page(
   BasePage({
     build() {
-      // Background
-      hmUI.createWidget(hmUI.widget.FILL_RECT, {
-        x: 0,
-        y: 0,
-        w: 480,
-        h: 480,
-        color: THEME.bg,
-      });
-
       // App Title
       hmUI.createWidget(hmUI.widget.TEXT, {
         x: 0,
-        y: 40,
+        y: 35,
         w: 480,
         h: 30,
         color: THEME.primary,
@@ -30,7 +21,7 @@ Page(
 
       hmUI.createWidget(hmUI.widget.TEXT, {
         x: 0,
-        y: 72,
+        y: 68,
         w: 480,
         h: 22,
         color: THEME.textMuted,
@@ -40,37 +31,54 @@ Page(
         text: 'Выберите тренировку:',
       });
 
-      // Button: Workout A
+      // Workout A Button
       hmUI.createWidget(hmUI.widget.BUTTON, {
         x: 48,
-        y: 115,
+        y: 105,
         w: 384,
-        h: 110,
-        radius: 24,
+        h: 100,
+        radius: 22,
         normal_color: THEME.cardBg,
         press_color: THEME.cardBorder,
-        text: 'WORKOUT A\nПрисед • Жим • Тяга',
+        text: 'WORKOUT A\nПрисед • Жим • Тяга • Пресс',
         color: THEME.textWhite,
-        text_size: 20,
+        text_size: 19,
         click_func: () => {
           this.startWorkout(WORKOUT_TEMPLATES[0]);
         },
       });
 
-      // Button: Workout B
+      // Workout B Button
       hmUI.createWidget(hmUI.widget.BUTTON, {
         x: 48,
-        y: 240,
+        y: 218,
         w: 384,
-        h: 110,
-        radius: 24,
+        h: 100,
+        radius: 22,
         normal_color: THEME.cardBg,
         press_color: THEME.cardBorder,
-        text: 'WORKOUT B\nСтановая • Плечи • Планка',
+        text: 'WORKOUT B\nСтановая • Жим стоя • Планка',
         color: THEME.textWhite,
-        text_size: 20,
+        text_size: 19,
         click_func: () => {
           this.startWorkout(WORKOUT_TEMPLATES[1]);
+        },
+      });
+
+      // Workout C Button
+      hmUI.createWidget(hmUI.widget.BUTTON, {
+        x: 48,
+        y: 330,
+        w: 384,
+        h: 100,
+        radius: 22,
+        normal_color: THEME.cardBg,
+        press_color: THEME.cardBorder,
+        text: 'WORKOUT C\nНаклонный жим • Руки • Икры',
+        color: THEME.accentPurple,
+        text_size: 19,
+        click_func: () => {
+          this.startWorkout(WORKOUT_TEMPLATES[2]);
         },
       });
 
@@ -79,14 +87,14 @@ Page(
       const syncKey = app.globalData.syncKey || 'HD-7838-6732';
       hmUI.createWidget(hmUI.widget.TEXT, {
         x: 0,
-        y: 395,
+        y: 445,
         w: 480,
-        h: 26,
+        h: 28,
         color: THEME.accentCyan,
-        text_size: 15,
+        text_size: 14,
         align_h: hmUI.align.CENTER_H,
         align_v: hmUI.align.CENTER_V,
-        text: `Синхр: ${syncKey}`,
+        text: `Облако: ${syncKey}`,
       });
     },
 
