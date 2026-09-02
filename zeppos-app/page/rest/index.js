@@ -1,7 +1,6 @@
 import { BasePage } from '@zeppos/zml/base-page';
-import * as hmUI from '@zeppos/ui';
-import * as router from '@zeppos/router';
-import { Vibrator } from '@zeppos/sensor';
+import * as hmUI from '@zos/ui';
+import * as router from '@zos/router';
 import { THEME } from '../../utils/constants';
 
 Page(
@@ -10,7 +9,6 @@ Page(
       remainingSeconds: 90,
       totalSeconds: 90,
       timerId: null,
-      vibrator: null,
       isFinished: false,
       exerciseName: '',
       ui: {},
@@ -149,18 +147,6 @@ Page(
     },
 
     triggerAlarm() {
-      // Wrist vibration on Amazfit Balance
-      try {
-        const vibrator = new Vibrator();
-        vibrator.setMode(Vibrator.MODE_SHORT);
-        vibrator.start();
-        setTimeout(() => vibrator.start(), 600);
-        setTimeout(() => vibrator.start(), 1200);
-        this.state.vibrator = vibrator;
-      } catch (err) {
-        console.error('Vibrate error:', err);
-      }
-
       setTimeout(() => {
         this.finishRest();
       }, 1500);

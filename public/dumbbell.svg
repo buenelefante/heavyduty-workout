@@ -14,7 +14,7 @@
   </defs>
 
   
-  <rect width="512" height="512" rx="108" fill="#002395"></rect>
+  <rect width="512" height="512" rx="108" fill="#10b981"></rect>
 
   
   <path d="M70 390 L210 170 L275 240 L440 80" stroke="url(#energy)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"></path>

@@ -4,6 +4,7 @@
   "app": {
     "appId": 1093481,
     "appName": "HeavyDuty",
+    "description": "StrongLifts 5x5 Plus workout tracker for Amazfit Balance",
     "appType": "app",
     "version": {
       "code": 1,
@@ -12,6 +13,7 @@
     "icon": "assets/icon.png",
     "vender": "HeavyDuty"
   },
+  "defaultLanguage": "ru-RU",
   "permissions": [
     "device:os.sensor.heart_rate",
     "device:os.vibrate",
@@ -21,11 +23,12 @@
   "runtime": {
     "apiVersion": {
       "compatible": "3.0.0",
-      "target": "4.0.0"
+      "target": "3.0.0",
+      "minVersion": "3.0.0"
     }
   },
   "targets": {
-    "amazfit-balance": {
+    "monaco": {
       "module": {
         "page": {
           "pages": [
@@ -42,23 +45,29 @@
           "exec": "side-service/index.js"
         },
         "setting": {
-          "exec": "setting/index.js"
+          "exec": "setting/index.js",
+          "path": "setting/index"
         }
       },
       "platforms": [
         {
-          "name": "balance",
-          "deviceSource": 279
+          "name": "Monaco",
+          "deviceSource": 8519936
         },
         {
-          "name": "balance-w",
-          "deviceSource": 11141376
+          "name": "MonacoWN",
+          "deviceSource": 8519937
+        },
+        {
+          "name": "MonacoW",
+          "deviceSource": 8519939
         }
       ],
       "designWidth": 480
     }
   },
   "package": {
+    "name": "heavyduty",
     "mode": "production"
   }
 }

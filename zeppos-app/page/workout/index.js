@@ -1,7 +1,6 @@
 import { BasePage } from '@zeppos/zml/base-page';
-import * as hmUI from '@zeppos/ui';
-import * as router from '@zeppos/router';
-import { HeartRate } from '@zeppos/sensor';
+import * as hmUI from '@zos/ui';
+import * as router from '@zos/router';
 import { THEME } from '../../utils/constants';
 
 Page(
@@ -10,8 +9,6 @@ Page(
       session: null,
       exercise: null,
       currentSet: null,
-      hrSensor: null,
-      currentHr: 0,
       ui: {},
     },
 
@@ -38,18 +35,18 @@ Page(
     },
 
     initHeartRateSensor() {
-      try {
-        const hr = new HeartRate();
-        hr.onCurrentChange(() => {
-          this.state.currentHr = hr.getCurrent();
-          if (this.state.ui.hrText) {
-            this.state.ui.hrText.setProperty(hmUI.prop.TEXT, `❤️ ${this.state.currentHr || '--'}`);
-          }
-        });
-        this.state.hrSensor = hr;
-      } catch (err) {
-        console.error('HR sensor init error:', err);
-      }
+      // try {
+      //   const hr = new HeartRate();
+      //   hr.onCurrentChange(() => {
+      //     this.state.currentHr = hr.getCurrent();
+      //     if (this.state.ui.hrText) {
+      //       this.state.ui.hrText.setProperty(hmUI.prop.TEXT, `❤️ ${this.state.currentHr || '--'}`);
+      //     }
+      //   });
+      //   this.state.hrSensor = hr;
+      // } catch (err) {
+      //   console.error('HR sensor init error:', err);
+      // }
     },
 
     renderUI() {
@@ -287,7 +284,7 @@ Page(
       if (session.currentExerciseIdx < session.exercises.length - 1) {
         session.currentExerciseIdx += 1;
         session.currentSetIdx = 0;
-        this.initCurrentState();
+        this.initCurrentState(); // Must come before updateViewTexts to refresh state.exercise & state.currentSet
         this.updateViewTexts();
       }
     },
@@ -316,11 +313,8 @@ Page(
     },
 
     onDestroy() {
-      if (this.state.hrSensor) {
-        try {
-          this.state.hrSensor.stop();
-        } catch (e) {}
-      }
+      // HR sensor is currently disabled; cleanup is a no-op
+      // When re-enabling HR: call hrSensor.offCurrentChange(callback)
     },
   })
 );

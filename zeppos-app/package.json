@@ -9,9 +9,11 @@
     "preview": "zeus preview"
   },
   "devDependencies": {
-    "@zeppos/zeus-cli": "^1.4.0",
     "@zeppos/device-types": "^3.0.0",
-    "@zeppos/zml": "^0.0.12"
+    "@zeppos/zeus-cli": "^1.5.24",
+    "@zeppos/zml": "^0.0.12",
+    "canvas": "^3.2.3",
+    "zeppos-app-utils": "^1.0.0"
   },
   "author": "HeavyDuty",
   "license": "MIT"
