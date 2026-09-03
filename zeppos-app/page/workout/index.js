@@ -2,6 +2,7 @@ import { BasePage } from '@zeppos/zml/base-page';
 import * as hmUI from '@zos/ui';
 import * as router from '@zos/router';
 import { THEME } from '../../utils/constants';
+import { keepScreenOn, releaseScreen } from '../../utils/screen';
 
 Page(
   BasePage({
@@ -24,6 +25,7 @@ Page(
       this.initCurrentState();
       this.initHeartRateSensor();
       this.renderUI();
+      keepScreenOn();
     },
 
     initCurrentState() {
@@ -290,6 +292,7 @@ Page(
     },
 
     handleFinishWorkout() {
+      releaseScreen();
       router.push({
         url: 'page/summary/index',
       });
@@ -313,8 +316,7 @@ Page(
     },
 
     onDestroy() {
-      // HR sensor is currently disabled; cleanup is a no-op
-      // When re-enabling HR: call hrSensor.offCurrentChange(callback)
+      releaseScreen();
     },
   })
 );

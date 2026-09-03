@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   TrendingUp, 
+  TrendingDown,
   Flame, 
   Award, 
   Activity, 
@@ -9,7 +10,8 @@ import {
   Clock, 
   Dumbbell,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Scale
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -82,6 +84,36 @@ export const AnalyticsView: React.FC = () => {
     }),
     tonnage: w.totalTonnageKg,
   }));
+
+  // Body Weight Progression Data
+  const bodyWeightData = completedWorkouts
+    .filter((w) => typeof w.bodyWeightKg === 'number' && w.bodyWeightKg > 0)
+    .map((w, idx) => ({
+      index: idx + 1,
+      date: new Date(w.endTime || w.startTime).toLocaleDateString('ru-RU', {
+        month: 'short',
+        day: 'numeric',
+      }),
+      fullDate: new Date(w.endTime || w.startTime).toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+      weight: w.bodyWeightKg as number,
+      workoutName: w.name,
+    }));
+
+  const latestWeight = bodyWeightData.length > 0 ? bodyWeightData[bodyWeightData.length - 1].weight : null;
+  const firstWeight = bodyWeightData.length > 0 ? bodyWeightData[0].weight : null;
+  const weightChange = (latestWeight !== null && firstWeight !== null) 
+    ? Math.round((latestWeight - firstWeight) * 10) / 10 
+    : 0;
+
+  const weightsList = bodyWeightData.map((d) => d.weight);
+  const minWeight = weightsList.length > 0 ? Math.min(...weightsList) : 0;
+  const maxWeight = weightsList.length > 0 ? Math.max(...weightsList) : 0;
+  const minDomain = Math.max(0, Math.floor(minWeight - 1));
+  const maxDomain = Math.ceil(maxWeight + 1);
 
   const keyExercises = [
     { id: 'squat', name: 'Приседания' },
@@ -175,6 +207,114 @@ export const AnalyticsView: React.FC = () => {
             );
           })}
         </div>
+      </div>
+
+      {/* Body Weight Progression Card */}
+      <div className="bg-[#121520] border border-[#23293a] rounded-3xl p-5 sm:p-6 shadow-xl mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <Scale className="w-5 h-5 text-cyan-400" />
+              Динамика веса тела
+            </h2>
+            <p className="text-xs text-slate-400">Изменение собственного веса между тренировками</p>
+          </div>
+
+          {latestWeight !== null && (
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono font-black text-sm">
+                {latestWeight} кг
+              </span>
+              {weightChange !== 0 && (
+                <span
+                  className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold flex items-center gap-1 border ${
+                    weightChange > 0
+                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                      : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                  }`}
+                  title="Изменение с первого взвешивания"
+                >
+                  {weightChange > 0 ? (
+                    <TrendingUp className="w-3.5 h-3.5" />
+                  ) : (
+                    <TrendingDown className="w-3.5 h-3.5" />
+                  )}
+                  {weightChange > 0 ? `+${weightChange}` : weightChange} кг
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {bodyWeightData.length === 0 ? (
+          <div className="h-44 rounded-2xl bg-slate-900/50 border border-slate-800/80 flex flex-col items-center justify-center text-slate-400 text-xs p-4 text-center">
+            <Scale className="w-8 h-8 text-slate-600 mb-2" />
+            <span className="font-semibold text-slate-300">Вес тела ещё не зафиксирован.</span>
+            <span className="text-slate-500 mt-1 max-w-sm">
+              Укажите ваш вес в карточке перед тренировкой на вкладке «Тренировки», чтобы здесь строился график динамики!
+            </span>
+          </div>
+        ) : (
+          <div>
+            {/* Quick Metrics Cards */}
+            <div className="grid grid-cols-3 gap-3 mb-5">
+              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 text-center">
+                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Текущий</div>
+                <div className="font-mono font-black text-lg text-cyan-300 mt-0.5">{latestWeight} кг</div>
+              </div>
+              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 text-center">
+                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Минимум</div>
+                <div className="font-mono font-black text-lg text-emerald-400 mt-0.5">{minWeight} кг</div>
+              </div>
+              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 text-center">
+                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Максимум</div>
+                <div className="font-mono font-black text-lg text-amber-400 mt-0.5">{maxWeight} кг</div>
+              </div>
+            </div>
+
+            {/* Chart */}
+            <div className="h-60 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={bodyWeightData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2433" />
+                  <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} />
+                  <YAxis
+                    stroke="#64748b"
+                    fontSize={11}
+                    tickLine={false}
+                    unit=" кг"
+                    domain={[minDomain, maxDomain]}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#0f121a',
+                      borderColor: '#262c3e',
+                      borderRadius: '12px',
+                      color: '#fff',
+                      fontSize: '12px',
+                    }}
+                    formatter={(val: any) => [`${val} кг`, 'Вес тела']}
+                    labelFormatter={(_, payload) => {
+                      if (payload && payload.length > 0) {
+                        return `${payload[0].payload.fullDate} • ${payload[0].payload.workoutName}`;
+                      }
+                      return '';
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="weight"
+                    name="Вес тела"
+                    stroke="#06b6d4"
+                    strokeWidth={3}
+                    dot={{ fill: '#06b6d4', r: 4, strokeWidth: 2, stroke: '#0e7490' }}
+                    activeDot={{ r: 6, fill: '#67e8f9', stroke: '#fff', strokeWidth: 2 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 1RM Progression Chart */}

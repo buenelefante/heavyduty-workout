@@ -4,7 +4,7 @@ App(
   BaseApp({
     globalData: {
       activeSession: null,
-      syncKey: 'HD-7838-6732',
+      syncKey: 'HD-7163-9242',
       lastCompletedWorkout: null,
     },
     onCreate() {

@@ -36,13 +36,13 @@ Page(
         x: 48,
         y: 105,
         w: 384,
-        h: 100,
-        radius: 22,
+        h: 95,
+        radius: 24,
         normal_color: THEME.cardBg,
         press_color: THEME.cardBorder,
-        text: 'WORKOUT A\nПрисед • Жим • Тяга • Пресс',
+        text: 'WORKOUT A',
         color: THEME.textWhite,
-        text_size: 19,
+        text_size: 30,
         click_func: () => {
           this.startWorkout(WORKOUT_TEMPLATES[0]);
         },
@@ -51,15 +51,15 @@ Page(
       // Workout B Button
       hmUI.createWidget(hmUI.widget.BUTTON, {
         x: 48,
-        y: 218,
+        y: 215,
         w: 384,
-        h: 100,
-        radius: 22,
+        h: 95,
+        radius: 24,
         normal_color: THEME.cardBg,
         press_color: THEME.cardBorder,
-        text: 'WORKOUT B\nСтановая • Жим стоя • Планка',
+        text: 'WORKOUT B',
         color: THEME.textWhite,
-        text_size: 19,
+        text_size: 30,
         click_func: () => {
           this.startWorkout(WORKOUT_TEMPLATES[1]);
         },
@@ -68,15 +68,15 @@ Page(
       // Workout C Button
       hmUI.createWidget(hmUI.widget.BUTTON, {
         x: 48,
-        y: 330,
+        y: 325,
         w: 384,
-        h: 100,
-        radius: 22,
+        h: 95,
+        radius: 24,
         normal_color: THEME.cardBg,
         press_color: THEME.cardBorder,
-        text: 'WORKOUT C\nНаклонный жим • Руки • Икры',
+        text: 'WORKOUT C',
         color: THEME.accentPurple,
-        text_size: 19,
+        text_size: 30,
         click_func: () => {
           this.startWorkout(WORKOUT_TEMPLATES[2]);
         },
@@ -84,7 +84,7 @@ Page(
 
       // Sync Key info at bottom
       const app = getApp();
-      const syncKey = app.globalData.syncKey || 'HD-7838-6732';
+      const syncKey = app.globalData.syncKey || 'HD-7163-9242';
       hmUI.createWidget(hmUI.widget.TEXT, {
         x: 0,
         y: 445,

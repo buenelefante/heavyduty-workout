@@ -19,7 +19,8 @@ import {
   MessageSquare,
   ChevronDown,
   ChevronUp,
-  Smile
+  Smile,
+  Scale
 } from 'lucide-react';
 import { WorkoutSession, WorkoutExercise, ExerciseSet, SetType } from '../types/workout';
 import { db } from '../db/db';
@@ -260,6 +261,32 @@ export const ActiveWorkoutView: React.FC<ActiveWorkoutViewProps> = ({
             <span className="font-mono font-bold text-sm text-slate-200">
               {tonnageKg} <span className="text-xs font-sans text-slate-400">кг</span>
             </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-800">
+            <Scale className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+            <input
+              type="number"
+              inputMode="decimal"
+              step="0.1"
+              placeholder="—"
+              value={workout.bodyWeightKg ?? ''}
+              onChange={(e) => {
+                const val = e.target.value;
+                const num = parseFloat(val);
+                const updated = !isNaN(num) && num > 0 ? num : undefined;
+                onUpdateWorkout({
+                  ...workout,
+                  bodyWeightKg: updated,
+                });
+                if (val.trim()) {
+                  localStorage.setItem('heavyduty_last_bodyweight', val.trim());
+                }
+              }}
+              className="w-12 bg-transparent text-center font-mono font-bold text-sm text-cyan-300 outline-none"
+              title="Вес тела на эту тренировку"
+            />
+            <span className="text-xs font-sans text-slate-500 pointer-events-none">кг</span>
           </div>
 
           <button

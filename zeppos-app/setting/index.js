@@ -16,7 +16,8 @@ AppSettingsPage({
         }),
         TextInput({
           label: 'Ключ синхронизации (Sync Key)',
-          value: props.settingsStorage.getItem('syncKey') || 'HD-7838-6732',
+          settingsKey: 'syncKey',
+          value: props.settingsStorage.getItem('syncKey') || 'HD-7163-9242',
           onChange: (val) => {
             props.settingsStorage.setItem('syncKey', val.trim().toUpperCase());
           },

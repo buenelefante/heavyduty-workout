@@ -26,7 +26,7 @@ AppSideService(
     },
 
     async uploadWorkoutToCloud(syncKey, newWorkout) {
-      const normalizedKey = (syncKey || 'HD-7838-6732').toUpperCase().trim();
+      const normalizedKey = (syncKey || 'HD-7163-9242').toUpperCase().trim();
 
       // 1. Fetch current cloud state from Upstash
       let existingData = {

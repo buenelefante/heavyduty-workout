@@ -2,6 +2,7 @@ import { BasePage } from '@zeppos/zml/base-page';
 import * as hmUI from '@zos/ui';
 import * as router from '@zos/router';
 import { THEME } from '../../utils/constants';
+import { releaseScreen } from '../../utils/screen';
 
 Page(
   BasePage({
@@ -24,6 +25,7 @@ Page(
         return;
       }
 
+      releaseScreen();
       this.calculateSummary();
       this.renderUI();
       this.syncWorkoutToPhoneAndCloud();
@@ -210,7 +212,7 @@ Page(
 
     syncWorkoutToPhoneAndCloud() {
       const app = getApp();
-      const syncKey = app.globalData.syncKey || 'HD-7838-6732';
+      const syncKey = app.globalData.syncKey || 'HD-7163-9242';
 
       this.request({
         action: 'SYNC_WORKOUT',
@@ -236,6 +238,10 @@ Page(
             this.state.ui.syncStatus.setProperty(hmUI.prop.TEXT, this.state.syncStatusText);
           }
         });
+    },
+
+    onDestroy() {
+      releaseScreen();
     },
   })
 );

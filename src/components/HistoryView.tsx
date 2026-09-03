@@ -12,7 +12,8 @@ import {
   FileText,
   Edit2,
   X,
-  Check
+  Check,
+  Scale
 } from 'lucide-react';
 import { db } from '../db/db';
 import { WorkoutSession } from '../types/workout';
@@ -30,6 +31,7 @@ export const HistoryView: React.FC = () => {
   const [expandedWorkoutId, setExpandedWorkoutId] = useState<string | null>(null);
   const [editingWorkout, setEditingWorkout] = useState<WorkoutSession | null>(null);
   const [editDateValue, setEditDateValue] = useState<string>('');
+  const [editBodyWeightValue, setEditBodyWeightValue] = useState<string>('');
 
   const loadWorkouts = async () => {
     const list = await db.workouts
@@ -47,6 +49,7 @@ export const HistoryView: React.FC = () => {
     e.stopPropagation();
     setEditingWorkout(w);
     setEditDateValue(toDatetimeLocalString(w.startTime));
+    setEditBodyWeightValue(w.bodyWeightKg ? w.bodyWeightKg.toString() : '');
   };
 
   const handleSaveDate = async () => {
@@ -57,11 +60,13 @@ export const HistoryView: React.FC = () => {
     const newStartTime = newDate.toISOString();
     const durationMs = (editingWorkout.durationSeconds || 0) * 1000;
     const newEndTime = new Date(newDate.getTime() + durationMs).toISOString();
+    const numWeight = parseFloat(editBodyWeightValue);
 
     const updated = {
       ...editingWorkout,
       startTime: newStartTime,
       endTime: newEndTime,
+      bodyWeightKg: !isNaN(numWeight) && numWeight > 0 ? numWeight : undefined,
     };
 
     await db.workouts.put(updated);
@@ -164,6 +169,12 @@ export const HistoryView: React.FC = () => {
                         <Dumbbell className="w-3.5 h-3.5 text-amber-400" />
                         {w.totalTonnageKg} кг
                       </span>
+                      {w.bodyWeightKg && (
+                        <span className="flex items-center gap-1.5 text-cyan-400 font-mono" title="Вес тела">
+                          <Scale className="w-3.5 h-3.5" />
+                          {w.bodyWeightKg} кг
+                        </span>
+                      )}
                     </div>
 
                     <button
@@ -276,6 +287,24 @@ export const HistoryView: React.FC = () => {
                   onChange={(e) => setEditDateValue(e.target.value)}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm font-mono text-cyan-300 outline-none focus:border-cyan-500 transition"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5">
+                  Вес тела (кг):
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    step="0.1"
+                    placeholder="—"
+                    value={editBodyWeightValue}
+                    onChange={(e) => setEditBodyWeightValue(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm font-mono text-cyan-300 outline-none focus:border-cyan-500 transition"
+                  />
+                  <span className="absolute right-3 top-2.5 text-xs font-bold text-slate-500 pointer-events-none">кг</span>
+                </div>
               </div>
 
               <div className="flex gap-2 pt-2">

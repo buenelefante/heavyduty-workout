@@ -60,6 +60,7 @@ export interface WorkoutSession {
   totalReps: number;
   completed: boolean;
   rpeAverage?: number;
+  bodyWeightKg?: number;
   notes?: string;
 }
 

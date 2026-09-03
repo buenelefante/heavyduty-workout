@@ -10,7 +10,8 @@ import {
   TrendingUp, 
   Info, 
   Zap,
-  Plus
+  Plus,
+  Scale
 } from 'lucide-react';
 import { ProgramTemplate, WorkoutSession, WorkoutExercise } from '../types/workout';
 import { STRONGLIFTS_PLUS_PROGRAMS, INITIAL_EXERCISES } from '../data/exercises';
@@ -30,6 +31,22 @@ export const WorkoutsView: React.FC<WorkoutsViewProps> = ({
   const [lastCompletedWorkout, setLastCompletedWorkout] = useState<WorkoutSession | null>(null);
   const [completedCount, setCompletedCount] = useState<number>(0);
   const [nextSuggestedCode, setNextSuggestedCode] = useState<'A' | 'B' | 'C'>('A');
+  const [bodyWeight, setBodyWeight] = useState<string>(
+    () => localStorage.getItem('heavyduty_last_bodyweight') || ''
+  );
+
+  const handleBodyWeightChange = (val: string) => {
+    setBodyWeight(val);
+    if (val.trim()) {
+      localStorage.setItem('heavyduty_last_bodyweight', val.trim());
+    }
+  };
+
+  const handleAdjustBodyWeight = (delta: number) => {
+    const current = parseFloat(bodyWeight) || 75;
+    const updated = Math.max(20, Math.round((current + delta) * 10) / 10);
+    handleBodyWeightChange(updated.toString());
+  };
 
   useEffect(() => {
     async function checkWorkoutHistory() {
@@ -120,6 +137,9 @@ export const WorkoutsView: React.FC<WorkoutsViewProps> = ({
       });
     }
 
+    const numWeight = parseFloat(bodyWeight);
+    const bodyWeightKg = !isNaN(numWeight) && numWeight > 0 ? numWeight : undefined;
+
     const newSession: WorkoutSession = {
       id: `workout-${Date.now()}`,
       name: `StrongLifts Plus - ${program.name}`,
@@ -131,6 +151,7 @@ export const WorkoutsView: React.FC<WorkoutsViewProps> = ({
       totalSets: 0,
       totalReps: 0,
       completed: false,
+      bodyWeightKg,
     };
 
     await db.workouts.put(newSession);
@@ -173,6 +194,7 @@ export const WorkoutsView: React.FC<WorkoutsViewProps> = ({
       totalSets: 0,
       totalReps: 0,
       completed: false,
+      bodyWeightKg: !isNaN(parseFloat(bodyWeight)) && parseFloat(bodyWeight) > 0 ? parseFloat(bodyWeight) : undefined,
     };
 
     await db.workouts.put(newSession);
@@ -229,6 +251,57 @@ export const WorkoutsView: React.FC<WorkoutsViewProps> = ({
               </button>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Pre-Workout Body Weight Card */}
+      <div className="bg-[#121520] border border-[#22283a] hover:border-cyan-500/30 transition rounded-2xl p-4 sm:p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 flex-shrink-0">
+            <Scale className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-sm font-bold text-white flex items-center gap-2">
+              Вес тела перед тренировкой
+              <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                Прогресс
+              </span>
+            </div>
+            <div className="text-xs text-slate-400 mt-0.5">
+              Сохраняется с тренировкой для графика динамики на вкладке «Прогресс»
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button
+            type="button"
+            onClick={() => handleAdjustBodyWeight(-0.5)}
+            className="w-10 h-10 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-slate-300 font-bold flex items-center justify-center text-xs border border-slate-700/60 transition"
+            title="-0.5 кг"
+          >
+            -0.5
+          </button>
+          <div className="relative flex items-center">
+            <input
+              type="number"
+              inputMode="decimal"
+              step="0.1"
+              placeholder="75.0"
+              value={bodyWeight}
+              onChange={(e) => handleBodyWeightChange(e.target.value)}
+              className="w-24 bg-slate-900 border border-cyan-500/40 focus:border-cyan-400 rounded-xl py-2 px-2.5 text-center font-mono font-bold text-cyan-400 text-lg outline-none transition"
+            />
+            <span className="absolute right-2 text-xs font-bold text-slate-500 pointer-events-none">кг</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleAdjustBodyWeight(0.5)}
+            className="w-10 h-10 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:scale-95 text-slate-300 font-bold flex items-center justify-center text-xs border border-slate-700/60 transition"
+            title="+0.5 кг"
+          >
+            +0.5
+          </button>
         </div>
       </div>
 

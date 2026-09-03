@@ -2,6 +2,7 @@ import { BasePage } from '@zeppos/zml/base-page';
 import * as hmUI from '@zos/ui';
 import * as router from '@zos/router';
 import { THEME } from '../../utils/constants';
+import { keepScreenOn } from '../../utils/screen';
 
 Page(
   BasePage({
@@ -116,6 +117,7 @@ Page(
       });
 
       this.startCountdown();
+      keepScreenOn();
     },
 
     startCountdown() {
