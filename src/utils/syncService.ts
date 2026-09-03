@@ -20,8 +20,8 @@ const SYNC_KEY_STORAGE_KEY = 'heavyduty_sync_key';
 const LAST_SYNCED_STORAGE_KEY = 'heavyduty_last_synced';
 
 // Global high-speed Redis Cloud Endpoint with instant CORS sync
-const UPSTASH_ENDPOINT = 'https://live-katydid-218032.upstash.io';
-const UPSTASH_TOKEN = 'gQAAAAAAA1OwAQIgcDIzOGNiOGYzNDIyZjc0NDI0YmVkOWZjNmMwMWM5ZjRhZQ';
+const UPSTASH_ENDPOINT = 'https://tidy-koi-128076.upstash.io';
+const UPSTASH_TOKEN = 'gQAAAAAAAfRMAAIgcDExNjI4YjdlNjNlZjg0NTI4OTU5OTgwYzhjZTljOTQyNQ';
 
 /**
  * Generates a clean human-readable sync key: e.g. "HD-8391-7249"

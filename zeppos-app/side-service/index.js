@@ -1,7 +1,7 @@
 import { BaseSideService } from '@zeppos/zml/base-side';
 
-const UPSTASH_ENDPOINT = 'https://live-katydid-218032.upstash.io';
-const UPSTASH_TOKEN = 'gQAAAAAAA1OwAQIgcDIzOGNiOGYzNDIyZjc0NDI0YmVkOWZjNmMwMWM5ZjRhZQ';
+const UPSTASH_ENDPOINT = 'https://tidy-koi-128076.upstash.io';
+const UPSTASH_TOKEN = 'gQAAAAAAAfRMAAIgcDExNjI4YjdlNjNlZjg0NTI4OTU5OTgwYzhjZTljOTQyNQ';
 
 AppSideService(
   BaseSideService({
